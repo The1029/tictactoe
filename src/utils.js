@@ -69,7 +69,7 @@ export const renderBoard = async () => {
   console.log(renderString);
   if (checkWins(playerOne)) {
     endGame();
-    console.log('Congratulations, Player One! You win!');
+    console.log('Congratulations, Player One! You win!\n');
     const again = await select({
       message: 'Play again?',
       choices: [
@@ -87,6 +87,7 @@ export const renderBoard = async () => {
     if (again) {
       newGame();
     } else {
+      console.log('Thanks for playing!\n');
       process.exit();
     }
   } else if (checkWins(playerTwo)) {
