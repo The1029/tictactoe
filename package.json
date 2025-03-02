@@ -1,14 +1,14 @@
 {
   "name": "tictactoe",
   "version": "1.0.0",
-  "description": "",
+  "description": "A simple tic tac toe game written in Javascript.",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "The1029",
   "license": "ISC",
   "dependencies": {
     "inquirer": "^12.4.2"
