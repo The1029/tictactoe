@@ -2,10 +2,34 @@ import { styleText } from 'node:util';
 import { select } from '@inquirer/prompts';
 import { onePlayer } from './onePlayer.js';
 import { twoPlayer } from './twoPlayer.js';
-import { activePlayer, available, endGame, playerOne, playerTwo, resetGlobals, selected } from './globals.js';
+import { activePlayer, available, endGame, playerOne, playerTwo, resetGlobals, selected, gameOver } from './globals.js';
 
-export const checkWins = (moves) => {
-  // There are 8 possible wincons to check.
+export const newGame = async () => {
+  console.clear();
+
+  const players = await select({
+    message: 'How many players?',
+    choices: [
+      {
+        name: 'Two',
+        value: 2
+      },
+      {
+        name: 'One',
+        value: 1,
+        disabled: '(Sorry, two player only at present!)'
+      }
+    ],
+  });
+
+  resetGlobals();
+
+  if ( players === 1) onePlayer();
+  if ( players === 2) twoPlayer();
+}
+
+const checkWins = (moves) => {
+  // There are 8 possible wincons in tic tac toe.
   // Top row - 1,2,3
   if (moves.includes(1) && moves.includes(2) && moves.includes(3)) return true;
   // Middle row - 4,5,6
@@ -26,27 +50,27 @@ export const checkWins = (moves) => {
   return false;
 }
 
-export const newGame = async () => {
-  console.clear();
-
-  const players = await select({
-    message: 'How many players?',
+const playAgain = async () => {
+  const again = await select({
+    message: 'Play again?',
     choices: [
       {
-        name: 'One',
-        value: 1,
+        name: 'Yes',
+        value: true
       },
       {
-        name: 'Two',
-        value: 2
+        name: 'No',
+        value: false
       }
     ],
   });
 
-  resetGlobals();
-
-  if ( players === 1) onePlayer();
-  if ( players === 2) twoPlayer();
+  if (again) {
+    newGame();
+  } else {
+    console.log('\nThanks for playing!');
+    process.exit();
+  }
 }
 
 export const renderBoard = async () => {
@@ -61,80 +85,30 @@ export const renderBoard = async () => {
   playerTwo.forEach(e => {
     boardState[e-1] = 'O';
   });
-  boardState[selected-1] = styleText(['bold', 'underline'], boardState[selected-1]);
 
+  boardState[selected-1] = styleText(['bold', 'underline'], boardState[selected-1]);
+  
   const renderString = ` ${boardState[0]} | ${boardState[1]} | ${boardState[2]} \n-----------\n ${boardState[3]} | ${boardState[4]} | ${boardState[5]} \n-----------\n ${boardState[6]} | ${boardState[7]} | ${boardState[8]} \n`;
 
   console.clear();
   console.log(renderString);
+}
+
+export const renderText = async () => {
   if (checkWins(playerOne)) {
     endGame();
     console.log('Congratulations, Player One! You win!\n');
-    const again = await select({
-      message: 'Play again?',
-      choices: [
-        {
-          name: 'Yes',
-          value: true
-        },
-        {
-          name: 'No',
-          value: false
-        }
-      ],
-    });
-  
-    if (again) {
-      newGame();
-    } else {
-      console.log('Thanks for playing!\n');
-      process.exit();
-    }
+    await playAgain();
   } else if (checkWins(playerTwo)) {
     endGame();
-    console.log('Congratulations, Player Two! You win!');
-    const again = await select({
-      message: 'Play again?',
-      choices: [
-        {
-          name: 'Yes',
-          value: true
-        },
-        {
-          name: 'No',
-          value: false
-        }
-      ],
-    });
-  
-    if (again) {
-      newGame();
-    } else {
-      process.exit();
-    }
+    console.log('Congratulations, Player Two! You win!\n');
+    await playAgain();
   } else if (available.length === 0) {
     endGame();
-    console.log('The game ends in a draw!');
-    const again = await select({
-      message: 'Play again?',
-      choices: [
-        {
-          name: 'Yes',
-          value: true
-        },
-        {
-          name: 'No',
-          value: false
-        }
-      ],
-    });
-    if (again) {
-      newGame();
-    } else {
-      process.exit();
-    }
+    console.log('The game ends in a draw!\n');
+    await playAgain();
   } else {
-    console.log('Use the arrow keys to select a square.');
-    console.log(`Player ${activePlayer}'s turn.`);
+    console.log('Use the arrow keys to select a square.\n');
+    console.log(`Player ${styleText(['bold'],activePlayer)}'s turn.`);
   }
 }

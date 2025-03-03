@@ -1,3 +1,6 @@
+// Contains all game logic variables as well as helper functions for changing them.
+
+// Globals
 export let activePlayer = 'One';
 export let selected = 1;
 export let available = [1,2,3,4,5,6,7,8,9];
@@ -14,7 +17,7 @@ export const resetGlobals = () => {
   gameOver = false;
 }
 
-export const changeActive = () => {
+export const changeActivePlayer = () => {
   if (activePlayer === 'One') {
     activePlayer = 'Two';
   } else {
@@ -27,13 +30,9 @@ export const endGame = () => {
   process.stdin.removeAllListeners('keypress');
 }
 
-export const decSelected = (n) => {
-  selected = selected - n;
-}
+export const decSelected = (n) => selected = selected - n;
 
-export const incSelected = (n) => {
-  selected = selected + n;
-}
+export const incSelected = (n) => selected = selected + n;
 
 export const registerMove = () => {
   if (activePlayer === 'One') {
@@ -41,8 +40,6 @@ export const registerMove = () => {
   } else {
     playerTwo = [...playerTwo, selected]
   }
-
-  changeActive();
 
   const index = available.indexOf(selected);
   if (index > -1) { // only splice array when item is found
